@@ -1,4 +1,4 @@
-package com.slz;
+package com.slz.app;
 
 /**
  * @author : SunLZ
