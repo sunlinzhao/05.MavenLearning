@@ -478,10 +478,82 @@ pom.xml 配置插件
 
 ### （2）依赖的传递性
 
+> 依赖具有传递性
 
+- 直接依赖
+- 间接依赖
 
+#### a. 依赖冲突问题解决：❤️
 
-### （3）依赖和插件的区别 ❤️ 
+```xml
+<dependency>
+     <groupId>mysql</groupId>
+     <artifactId>mysql-connector-java</artifactId>
+     <version>8.0.29</version>
+</dependency>
+<dependency>
+     <groupId>mysql</groupId>
+     <artifactId>mysql-connector-java</artifactId>
+     <version>8.0.28</version>
+</dependency>
+```
+
+1. **路径最短优先**：当依赖出现重复资源时，路径最短优先（在这里是A间接依赖E2.0版本）；
+
+   ![image.png](assets/image27.png)
+2. **声明顺序优先**：当依赖资源路径长短相同时，配置顺序在前面的优先；
+
+   ![image.png](assets/image28.png)
+3. **后配置优先**（特殊情况）：在 pom.xml 文件中，同时写依赖了一个资源的两个版本，后配置优先；
+
+#### b. 依赖冲突避免
+
+1. 可选依赖
+
+在 pom.xml 文件中，通过 `<optional>true</optional>`，配置：
+
+```xml
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.29</version>
+            <optional>true</optional>
+        </dependency>
+```
+
+2. 排除依赖
+
+（a）maven-helper 插件解决
+
+- 安装 maven-helper 插件：
+
+![image.png](assets/image29.png)
+
+- 在 pom.xml 文件下，有 Dependency Analyzer ：
+
+![image.png](assets/image30.png)
+
+![image.png](assets/image31.png)
+
+（b）手动配置
+
+排除配置 pro1 对于 pro2 项目中的依赖的资源进行排除，不需要指定版本
+
+```xml
+    <dependency>
+      <groupId>com.slz</groupId>
+      <artifactId>demo</artifactId>
+      <version>1.0</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>mysql-connector-java</artifactId>
+          <groupId>mysql</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+```
+
+### （3）依赖和插件的区别 ❤️
 
 > Maven 依赖和插件是 Maven 构建工具中的两个重要概念，它们虽然有些相似，但各自有不同的作用和功能：
 
@@ -521,6 +593,204 @@ pom.xml 配置插件
      ```
 
 > 总的来说，依赖是项目运行所需的外部库，而插件是 Maven 用于管理构建过程的工具。 ❤️
+
+## 3. Maven 模块的拆分、聚合和继承
+
+### （1）聚合
+
+pom.xml 文件配置：
+
+```xml
+  <packaging>pom</packaging> <!-- 父模块需要声明为pom文件，不需要打为jar包 -->
+  
+  <modules>
+      <module>demo</module> <!-- 导入模块-->
+      <module>mvn_app</module>
+  </modules>
+```
+
+> 这里只是将其它模块导入，形成聚合关系（这时候还不是继承关系（父子模块）），这种聚合的关系，使得 root 模块打包时，自动分析依赖关系和版本冲突，比较方便
+
+![image.png](assets/image33.png)
+
+### （2）继承
+
+在 pom.xml 文件中作父模块声明，表明继承关系
+
+```xml
+<!--    父模块声明-->
+    <parent>
+        <groupId>com.slz</groupId>
+        <artifactId>MyProject</artifactId>
+        <version>1.0</version>
+    </parent>
+```
+
+> 因此，可以将子模块中公共的依赖，或规范提取到父模块中进行配置，便于统一管理，降低耦合性
+
+子模块只需要写 artifactId，不写 groupId 和 version，它们将于父模块保持一致；
+
+```xml
+  <artifactId>demo</artifactId>
+```
+
+`<dependencyManagement>` 和`<dependencies>`之间的关系如下：❤️
+
+> - 版本管理:
+>   - `<dependencyManagement>`中声明的依赖版本可以被子项目或其他模块继承。
+>   - 如果子项目中的`<dependencies>`部分引用了一个`<dependencyManagement>`中声明过的依赖，并且没有指定版本号，则会使用`<dependencyManagement>`中定义的版本号。
+> - 依赖引入:
+>   - `<dependencies> `中声明的依赖会被实际添加到项目的类路径中。
+>   - `<dependencyManagement> `中声明的依赖不会自动添加到类路径中，除非在`<dependencies>`中显式声明。
+
+#### a. 依赖管理 ⭐️
+
+- 父pom
+
+```xml
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>8.0.28</version>
+        <!--            <optional>true</optional>-->
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.13.2</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+```
+
+- 子 pom
+
+```xml
+  <dependencies>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+```
+
+> 父模块依赖管理中的依赖，子模块不需要再写版本号，默认使用父模块的依赖管理中的版本（如果需要则可以指定其它版本） ❤️
+
+#### b. 插件管理 ⭐️
+
+- 父 pom
+
+```xml
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>2.7</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.3</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+```
+
+- 子 pom
+
+```xml
+<build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <configuration>
+                    <locales>zh_CN</locales>
+                </configuration>
+            </plugin>
+        </plugins>
+<build>
+```
+
+## 4. Maven 属性设置 ❤️
+
+```xml
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+  </properties>
+```
+
+#### ⭐️ maven 依赖版本搜索插件工具
+
+![image.png](assets/image36.png)
+
+![image.png](assets/image37.png)
+
+![image.png](assets/image38.png)
+
+### （1）自定义属性 ⭐️
+
+pom.xml 文件配置：
+
+![image.png](assets/image39.png)
+
+### （2）内置属性
+
+- `${basedir}` : 项目根目录;
+- `${version}` : 项目版本;
+
+### （3）pom 属性
+
+- `${project.build.sourceDirectory}` : 默认 src/main/java
+- `${project.build.testSource.Driectory}` : 默认 src/main/test
+- `${project.build.directory}` : 默认 target/
+- `${project.outputDirectory}` : 默认 target/classes
+- `${project.testOutputDirectory}` : 默认 target/test-classes
+- `${project.groupId}`
+- `${project.artifactId}`
+- `${project.version}`
+
+### （4）setting 属性
+
+> 主要用来读取 conf/setting.xml 文件值的
+
+- `${setting.localRepository}` : 读取本地仓库地址（文件路径）；
+
+### （5）Java 系统属性
+
+> 通过指令`mvn help:system`查看属性
+
+![image.png](assets/image40.png)
+
+### （6）环境变量属性
+
+> 通过指令`mvn help:system`查看属性
+
+![image.png](assets/image32.png?t=1723972048358)
+
+## 5. Maven 对配置文件和资源文件的管理
+
+
+
+
+
+
 
 
 

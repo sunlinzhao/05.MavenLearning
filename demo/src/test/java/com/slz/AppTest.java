@@ -1,4 +1,4 @@
-package com/slz;
+package com.slz;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

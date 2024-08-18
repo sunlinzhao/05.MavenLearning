@@ -3,11 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+<!--    父模块声明-->
+    <parent>
+        <groupId>com.slz</groupId>
+        <artifactId>MyProject</artifactId>
+        <version>1.0</version>
+    </parent>
     <!--  Maven坐标  -->
-    <groupId>com.slz</groupId> <!--  公司或组织名  -->
+<!--    <groupId>com.slz</groupId> &lt;!&ndash;  公司或组织名  &ndash;&gt;-->
     <artifactId>mvn_app</artifactId> <!--  项目名字  -->
-    <version>1.0</version> <!--  版本号  -->
+<!--    <version>1.0</version> &lt;!&ndash;  版本号  &ndash;&gt;-->
     <packaging>jar</packaging>
 
     <!-- 依赖   -->
@@ -16,14 +21,15 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+<!--            <version>4.13.2</version>-->
             <scope>test</scope> <!-- 作用范围 -->
         </dependency>
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.29</version>
+<!--            <version>8.0.29</version>-->
+<!--            <optional>true</optional>-->
         </dependency>
     </dependencies>
 
@@ -32,12 +38,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.7</version>
+<!--                <version>2.7</version>-->
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.3</version>
+<!--                <version>3.3</version>-->
                 <configuration>
                     <locales>zh_CN</locales>
                 </configuration>
