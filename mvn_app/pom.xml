@@ -15,6 +15,11 @@
 <!--    <version>1.0</version> &lt;!&ndash;  版本号  &ndash;&gt;-->
     <packaging>jar</packaging>
 
+    <properties>
+        <!-- 自定义属性-->
+        <jdbc.user>root</jdbc.user>
+    </properties>
+
     <!-- 依赖   -->
     <dependencies>
         <!-- https://mvnrepository.com/artifact/junit/junit -->
@@ -64,6 +69,19 @@
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <!-- 包含资源文件的目录-->
+                <directory>src/main/java</directory>
+                <!-- 要参与编译的资源文件-->
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
+                <!--是否资源文件在 pom.xml 文件中做了配置并引用-->
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
 </project>

@@ -786,10 +786,106 @@ pom.xml 文件配置：
 
 ## 5. Maven 对配置文件和资源文件的管理
 
+- src/main/java 目录下只有.java文件会被编译，放在target/classes下面，其他文件，默认情况下不会被放在 target/classes 目录下；
+- src/main/resoueces 下的资源文件打包时会被放在 META-INF/maven 文件夹下；
+- 如果有其它的资源文件，不在 src/main/resoueces 目录下，则需要在 pom.xml 的 build 元素下做配置；
 
----
+![image.png](assets/image43.png)
+
+```xml
+  <build>
+        <resources>
+            <resource>
+                <!-- 包含资源文件的目录-->
+                <directory>src/main/java</directory>
+                <!-- 要参与编译的资源文件-->
+                <includes>
+                    <include>**/*.xml</include>
+                    <include>**/*.properties</include>
+                </includes>
+                <!--是否资源文件在 pom.xml 文件中做了配置并引用-->
+                <filtering>false</filtering>
+            </resource>
+        </resources>
+    </build>
+```
+
+> 其中的`<filtering>false</filtering>` 标签，是表明"是否资源文件在 pom.xml 文件中做了配置并引用"，意思是
+>
+> ![image.png](assets/image41.png)
+>
+> 上述资源/配置文件中的引用要不要在编译时替换为原值 root,需要替换设为 true,否则默认为 false;
+>
+> ![image.png](assets/image42.png)
+
+# 四、Maven 私服 Nexus
+
+## 1. Nexus 下载与安装
+
+> ❤️ Nexus 是 JAVA 编写的
+
+> 下载地址：https://help.sonatype.com/repomanager3/product-information/download
+>
+> linux：https://download.sonatype.com/nexus/3/nexus-3.71.0-06-unix.tar.gz
+>
+> win: https://download.sonatype.com/nexus/3/nexus-3.71.0-06-win64.zip
+>
+> ![image.png](assets/image44.png)
+
+1. 下载
+2. 解压后（路径不要有中文），有两个文件夹：
+
+   ![image.png](assets/image45.png)
+3. 启动: 进入 `nexus-3.71.0-06/bin`目录, 不是点击 nexus.exe 执行，而是 在控制台运行指令`nexus /run nexus_server`
+
+   ![image.png](assets/image46.png)
+4. 出现以下说明启动成功
+
+![image.png](assets/image47.png)
+
+5. 打开历览器，访问 http://localhost:8081/
+
+![image.png](assets/image48.png)
+
+> - 默认占用端口号 8081，可以在 nexus-3.70.1-02-java11-win64\nexus-3.70.1-02\etc 目录下的 nexus-default.properties 文件中修改端口号
+>
+> ![image.png](assets/image49.png)
+>
+> - 修改虚拟机参数，在 nexus-3.70.1-02-java11-win64\nexus-3.70.1-02\bin\nexus.vmoptions 文件中修改：
+>
+>   ![image.png](assets/image51.png)
+
+## 2. Nexus 登录和退出
+
+浏览器访问 http://localhost:8081/，如下图：
+
+![image.png](assets/image52.png)
+
+![image.png](assets/image54.png)
+
+![image.png](assets/image55.png?t=1723988907645)
+
+> 然后就可以登录了！
+
+登陆后界面变化：
+
+![image.png](assets/image56.png)
 
 
+## 3. Nexus 私服仓库分类
+
+![image.png](assets/image57.png)
+
+- 代理仓库：代理远程仓库，访问全球中央仓库或者其它公共仓库，将资源存储在私服上；
+- 宿主仓库：公司自己研发的资源或者像 oracle 驱动这样非开源项目资源，可以分成：
+  - snapshot：快照版；
+  - release：发布版；
+- 仓库组：仓库组中包含多个仓库，本身不能存资源的，简化配置，避免用户自己去查找每个仓库；
+
+## 4. Nexus 仓库创建与分组
+
+
+![image.png](assets/image59.png)
 
 
 

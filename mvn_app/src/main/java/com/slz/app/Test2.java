@@ -6,42 +6,57 @@ package com.slz.app;
  * @date : 2024/8/17
  */
 import java.util.Scanner;
+import java.util.HashMap;
 
 public class Test2 {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // 读取数组长度
+        // 读取球的数量
         int n = scanner.nextInt();
+        HashMap<Long, Integer> colorCounts = new HashMap<>();
 
-        long sum = 0;
-        long[] array = new long[n];
-
-        // 读取数组并计算总和
+        // 读取每个球的颜色
         for (int i = 0; i < n; i++) {
-            array[i] = scanner.nextLong();
-            sum += array[i];
+            long color = scanner.nextLong();
+            colorCounts.put(color, colorCounts.getOrDefault(color, 0) + 1);
         }
 
-        // 计算目标值（平均值向下取整）
-        long target = sum / n;
+        // 计算最少需要添加多少个球
+        int minAdditions = calculateMinAdditions(colorCounts);
 
-        // 计算总的操作次数
-        long operations = 0;
-        for (int i = 0; i < n; i++) {
-            operations += Math.abs(array[i] - target);
-        }
-
-        // 因为每次操作可以抵消+1和-1，所以结果除以2
-        // 注意这里我们使用Math.ceil来确保得到正确的向上取整的结果
-        System.out.println((int)Math.ceil(operations / 2.0));
+        // 输出结果
+        System.out.println(minAdditions);
 
         scanner.close();
     }
+
+    private static int calculateMinAdditions(HashMap<Long, Integer> colorCounts) {
+        int totalBalls = 0;
+        for (Integer count : colorCounts.values()) {
+            totalBalls += count;
+        }
+
+        int minAdditions = 0;
+        for (Integer count : colorCounts.values()) {
+            if (count % 3 == 0) {
+                // 如果颜色的数量已经是3的倍数，不需要额外添加
+                continue;
+            } else {
+                // 否则，需要添加到最接近的3的倍数
+                minAdditions += 3 - (count % 3);
+            }
+        }
+
+        // 如果总的球数是3的倍数，那么添加的数量正好等于缺失的数量
+        // 如果不是3的倍数，那么还需要添加到最接近的3的倍数
+        if (totalBalls % 3 != 0) {
+            minAdditions += 3 - (totalBalls % 3);
+        }
+
+        return minAdditions;
+    }
 }
-
-
-
 
 
