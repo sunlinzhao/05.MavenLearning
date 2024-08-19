@@ -65,4 +65,17 @@
       </plugins>
     </pluginManagement>
   </build>
+  <!--发布管理-->
+  <distributionManagement>
+    <!--发布版本-->
+    <repository>
+      <id>maven-public</id> <!-- 对应 maven/conf/setting.xml 中配置的 server 元素的 id 标签，对应用户名和密码，用于访问-->
+      <url>http://localhost:8081/repository/slz-release/</url>
+    </repository>
+    <!--快照版本-->
+    <snapshotRepository>
+      <id>maven-public</id>
+      <url>http://localhost:8081/repository/slz-snapshot/</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>

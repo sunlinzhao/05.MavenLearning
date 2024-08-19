@@ -871,7 +871,6 @@ pom.xml 文件配置：
 
 ![image.png](assets/image56.png)
 
-
 ## 3. Nexus 私服仓库分类
 
 ![image.png](assets/image57.png)
@@ -884,13 +883,155 @@ pom.xml 文件配置：
 
 ## 4. Nexus 仓库创建与分组
 
-
 ![image.png](assets/image59.png)
 
+![image.png](assets/image58.png)
 
+创建一个存放release版本的仓库：
 
+![image.png](assets/image60.png)
 
+创建一个存放snapshot版本的仓库：
 
+![image.png](assets/image61.png)
 
+![image.png](assets/image62.png)
 
-+++++++++++++++++++++
+将两个仓库加入到 maven-public 组：
+
+![image.png](assets/image63.png)
+
+## 5. Nexus 上传资源
+
+### （1）手工上传第三方资源
+
+![image.png](assets/image64.png)
+
+上传打包好的jar包：
+
+![image.png](assets/image66.png)
+
+![image.png](assets/image65.png)
+
+![image.png](assets/image67.png)
+
+### （2）IDEA 操纵 nexus 私服
+
+![image.png](assets/image68.png)
+
+在本地仓库需要配置的：（setting.xml）
+
+- 访问私服的帐号和密码
+- 下载的地址
+
+在工程中配置的：
+
+- 上传的地址
+
+#### a. 配置 setting.xml
+
+> 在 maven 下 conf->settings.xml 下的 servers 中配置:
+
+> - 账号密码
+> - 下载地址
+
+1. 账号密码
+
+```xml
+<servers>
+    <server>
+        <id>maven-public</id>
+        <username>admin</username>
+        <password>password</password>
+    </server>
+</servers>
+```
+
+2. 下载地址
+
+在 profiles 元素下配置：
+
+访问地址：
+
+![image.png](assets/image69.png)
+
+```xml
+  </profiles>
+    <profile>
+        <id>nexus</id>
+        <repositories>
+            <repository>
+                <id>maven-public</id>
+                <name>slz-nexus</name>
+                <url>http://localhost:8081/repository/maven-public/</url>
+                <releases>
+                    <enabled>true</enabled>
+                </releases>
+                <snapshots>
+                    <enabled>true</enabled>
+                </snapshots>
+            </repository>
+        </repositories>
+        <pluginRepositories>
+            <pluginRepository>
+                <id>maven-public</id>
+                <url>http://localhost:8081/repository/maven-public/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+              </pluginRepository>
+        </pluginRepositories>
+    </profile>
+  </profiles>
+```
+
+激活该配置：
+
+```xml
+   <activeProfiles>
+    <activeProfile>nexus</activeProfile>
+  </activeProfiles>
+```
+
+#### b. 配置 IDEA 工程
+
+> 上传资源地址配置
+
+在工程的 pom.xml 文件中配置：
+
+```xml
+<!--发布管理-->
+  <distributionManagement>
+    <!--发布版本-->
+    <repository>
+      <id>maven-public</id> <!-- 对应 maven/conf/setting.xml 中配置的 server 元素的 id 标签，对应用户名和密码，用于访问-->
+      <url>http://localhost:8081/repository/slz-release/</url>
+    </repository>
+    <!--快照版本-->
+    <snapshotRepository>
+      <id>maven-public</id>
+      <url>http://localhost:8081/repository/slz-snapshot/</url>
+    </snapshotRepository>
+  </distributionManagement>
+```
+
+![image.png](assets/image71.png)
+
+![image.png](assets/image72.png)
+
+配置完成之后，运行指令：`mvn deploy` , 将项目打包发布到 nexus 私服仓库；
+
+![image.png](assets/image74.png?t=1724052578054)
+
+![image.png](assets/image73.png?t=1724052638813)
+
+## 6. Nexus 下载资源
+
+![image.png](assets/image.png)
+
+配置完成后，导入依赖，运行指令：`mvn compile`，即可从 nexus 私服，下载依赖到本地仓库；
+
+![image.png](assets/image70.png)
